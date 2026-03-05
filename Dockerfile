@@ -1,10 +1,14 @@
-FROM rust:1.85-slim AS builder
-WORKDIR /build
+FROM rust:1.75-slim AS builder
+WORKDIR /app
+RUN apt-get update && apt-get install -y pkg-config libssl-dev
 COPY . .
+ENV SQLX_OFFLINE=true
 RUN cargo build --release
 
-FROM debian:trixie-slim
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/*
-COPY --from=builder /build/target/release/va-status-server /usr/local/bin/
-EXPOSE 8080
-CMD ["va-status-server"]
+FROM debian:bookworm-slim
+WORKDIR /app
+RUN apt-get update && apt-get install -y ca-certificates libssl3 && rm -rf /var/lib/apt/lists/*
+COPY --from=builder /app/target/release/va-status /usr/local/bin/va-status
+COPY configuration configuration
+ENV APP_APPLICATION__HOST=0.0.0.0
+ENTRYPOINT ["va-status"]
