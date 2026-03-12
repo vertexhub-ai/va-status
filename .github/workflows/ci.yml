@@ -12,18 +12,18 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
-      - name: Run tests
-        run: cargo test
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt, clippy
+    - uses: actions/checkout@v3
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20.x' # Update to a recent LTS version for better compatibility and security
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci # Use npm ci for clean and reproducible installs in CI environments
+
+    - name: Run tests
+      run: npm test
       - name: Check formatting
         run: cargo fmt -- --check
       - name: Clippy
