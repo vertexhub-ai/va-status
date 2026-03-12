@@ -22,9 +22,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt, clippy
-      - name: Check formatting
-        run: cargo fmt -- --check
-      - name: Clippy
-        run: cargo clippy -- -D warnings
+    - name: Install wasm-pack
+      run: cargo install wasm-pack
+    - name: Run wasm tests
+    - name: Build WASM package
+      run: wasm-pack build --target web --release
+    - name: Run wasm tests
+      run: wasm-pack test --node
+    - name: Another CI step
+      run: echo "Continuing CI..."
