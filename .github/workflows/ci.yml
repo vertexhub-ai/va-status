@@ -4,25 +4,41 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-env:
-  CARGO_TERM_COLOR: always
-  SQLX_OFFLINE: true
-jobs:
-  test:
-    name: Test
+  Lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
-      - name: Run tests
-        run: cargo test
-  lint:
-    name: Lint
+    - uses: actions/checkout@v3
+    - uses: actions/setup-go@v4
+      with:
+        go-version: '1.22' # Use a recent stable Go version
+        cache: true
+
+    - name: Download Go modules
+      run: go mod download
+
+    - name: Check formatting
+      run: |
+        go fmt ./...
+        go vet ./...
+        git diff --exit-code
+
+  Test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
-        with:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-go@v4
+      with:
+        go-version: '1.22' # Use a recent stable Go version
+        cache: true
+
+    - name: Download Go modules
+      run: go mod download
+
+    - name: Run go mod tidy
+      run: go mod tidy
+
+    - name: Run tests
+      run: go test -v ./...
           components: rustfmt, clippy
       - name: Check formatting
         run: cargo fmt -- --check
