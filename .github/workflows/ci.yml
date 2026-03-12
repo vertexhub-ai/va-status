@@ -12,15 +12,20 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
-      - name: Run tests
-        run: cargo test
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+    - name: Install Rust toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        target: wasm32-unknown-unknown
+        override: true
+    - name: Install wasm-pack
+      run: cargo install wasm-pack
+    - name: Build
+      run: cargo build --verbose
+    - name: Run tests
+      # The 'cargo test' step might not be configured appropriately for a project targeting 'wasm32-unknown-unknown'.
+      # Using wasm-pack to run tests in a WASM environment.
+      run: wasm-pack test --node
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
