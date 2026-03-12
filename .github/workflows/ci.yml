@@ -9,14 +9,14 @@ env:
   SQLX_OFFLINE: true
 jobs:
   test:
-    name: Test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
-      - name: Run tests
-        run: cargo test
-  lint:
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+    - name: Install dependencies (clean install)
+      run: npm ci
+    - name: Build frontend
+      run: npm run build
+    - name: Run tests
     name: Lint
     runs-on: ubuntu-latest
     steps:
